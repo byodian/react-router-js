@@ -5,16 +5,14 @@ import {
   Form,
   useLoaderData,
   useNavigation,
+  useSubmit,
   redirect
 } from "react-router-dom";
 import { getContacts, createContact } from "../contacts";
 import { useState, useEffect } from "react";
 
 export async function loader({ request }) {
-  console.log(request)
   const url = new URL(request.url)
-  
-  console.log(url)
   const q = url.searchParams.get("q") || ""
   const contacts = await getContacts(q)
   return { contacts, q }
@@ -22,15 +20,17 @@ export async function loader({ request }) {
 
 export async function action() {
   const contact = await createContact()
-  console.log(contact)
   return redirect(`/contacts/${contact.id}/edit`)
 }
 
 export default function Root() {
   const { contacts, q } = useLoaderData()
-  console.log(q)
-  const [ query, setQuery ] = useState(q)
+  const [query, setQuery] = useState(q)
   const navigation = useNavigation()
+  const submit = useSubmit()
+
+  const searching = navigation.location && 
+    new URLSearchParams(navigation.location.search).has("q")
 
   useEffect(() => {
     setQuery(q)
@@ -49,11 +49,21 @@ export default function Root() {
               type="search"
               name="q"
               value={query}
+              className={searching ? "loading" : ""}
               onChange={(event) => {
+                const isFirstSeach = q == null;
+                console.log(isFirstSeach)
                 setQuery(event.target.value)
+                submit(event.currentTarget.form, {
+                  replace: !isFirstSeach
+                })
               }}
             />
-            <div id="search-spinner" aria-hidden hidden={true}></div>
+            <div 
+              id="search-spinner" 
+              aria-hidden 
+              hidden={!searching} 
+            />
             <div className="sr-only" aria-live="polite"></div>
           </Form>
           <Form method="post">
