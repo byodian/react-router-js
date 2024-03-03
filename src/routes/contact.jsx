@@ -53,7 +53,7 @@ export default function Contact() {
 
         <div>
           <Form action="edit">
-            <button type="button">Edit</button>
+            <button type="submit">Edit</button>
           </Form>
 
           <Form
@@ -67,7 +67,7 @@ export default function Contact() {
               }
             }}
           >
-            <button type="submit">Submit</button>
+            <button type="submit">Delete</button>
           </Form>
         </div>
       </div>
